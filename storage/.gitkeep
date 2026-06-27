@@ -1,0 +1,5 @@
+# storage directory — auto-created by brain/config.py
+# This file keeps the storage/ directory tracked in git.
+
+notes/   ← Markdown note files (one per saved session)
+chroma/  ← ChromaDB persistent HNSW index

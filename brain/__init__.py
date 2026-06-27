@@ -1,0 +1,3 @@
+"""
+Second Brain — brain package.
+"""
