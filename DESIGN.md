@@ -1218,10 +1218,7 @@ sequenceDiagram
     Index-->>History: [(title, count, last_accessed)]
     History->>History: format with HISTORY_TEMPLATES["frequency"]
     History->>UI: formatted string · no LLM call
-    UI->>User: "You've revisited these topics most often:
-1. Retrieval Design Tradeoffs — 6 times
-2. UX Patterns for AI Tools — 4 times
-..."
+    UI->>User: "You've revisited these topics most often:<br/>1. Retrieval Design Tradeoffs — 6 times<br/>2. UX Patterns for AI Tools — 4 times<br/>..."
 ```
 
 ---
@@ -1239,21 +1236,21 @@ gantt
     index.py · MongoDB + ChromaDB schema + CRUD :s1b, after s1a, 1d
     notes.py · Markdown write + parse           :s1c, after s1b, 1d
     orchestrator.py · litellm + instructor      :s1d, after s1c, 1d
-    Smoke test: save note, read it back         :milestone, after s1d, 0d
+    Smoke test: save note, read it back         :s1_done, after s1d, 1d
 
     section Stage 2 — Retrieval
     index.py · ChromaDB parent+child chunks     :s2a, after s1d, 1d
     index.py · BM25 persistence                 :s2b, after s2a, 1d
     reranker.py · CrossEncoder wrapper          :s2c, after s2b, 1d
     retrieval.py · dense+sparse+RRF+rerank      :s2d, after s2c, 1d
-    Test: 10 notes · 20 queries                 :milestone, after s2d, 0d
+    Test: 10 notes · 20 queries                 :s2_done, after s2d, 1d
 
     section Stage 3 — Session loop + router
     session.py · sliding token window           :s3a, after s2d, 1d
     router.py · regex fast-path                 :s3b, after s3a, 1d
     intent.py · fast-path + LLM fallback        :s3c, after s3b, 1d
     main.py · Rich TUI loop                     :s3d, after s3c, 1d
-    End-to-end: think → save → fresh → find     :milestone, after s3d, 0d
+    End-to-end: think → save → fresh → find     :s3_done, after s3d, 1d
 
     section Stage 4 — History + Profiles + Streamlit
     history.py · MongoDB aggregations+templates :s4a, after s3d, 1d
