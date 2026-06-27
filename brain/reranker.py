@@ -24,7 +24,11 @@ def _get_reranker():
     if _reranker is None:
         from sentence_transformers import CrossEncoder
         logger.info("Loading cross-encoder model: %s", config.RERANKER_MODEL)
-        _reranker = CrossEncoder(config.RERANKER_MODEL)
+        try:
+            _reranker = CrossEncoder(config.RERANKER_MODEL)
+        except Exception as exc:
+            logger.warning("Failed loading online model, retrying with local_files_only=True: %s", exc)
+            _reranker = CrossEncoder(config.RERANKER_MODEL, local_files_only=True)
         logger.info("Cross-encoder loaded.")
     return _reranker
 

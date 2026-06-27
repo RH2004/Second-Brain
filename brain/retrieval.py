@@ -33,7 +33,11 @@ def _get_embedder():
     if _embedder is None:
         from sentence_transformers import SentenceTransformer
         logger.info("Loading embedding model for retrieval: %s", config.EMBEDDING_MODEL)
-        _embedder = SentenceTransformer(config.EMBEDDING_MODEL)
+        try:
+            _embedder = SentenceTransformer(config.EMBEDDING_MODEL)
+        except Exception as exc:
+            logger.warning("Failed loading online model, retrying with local_files_only=True: %s", exc)
+            _embedder = SentenceTransformer(config.EMBEDDING_MODEL, local_files_only=True)
     return _embedder
 
 

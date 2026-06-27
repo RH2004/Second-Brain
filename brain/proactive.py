@@ -28,7 +28,11 @@ def _get_embedder():
     global _embedder
     if _embedder is None:
         from sentence_transformers import SentenceTransformer
-        _embedder = SentenceTransformer(config.EMBEDDING_MODEL)
+        try:
+            _embedder = SentenceTransformer(config.EMBEDDING_MODEL)
+        except Exception as exc:
+            logger.warning("Failed loading online model, retrying with local_files_only=True: %s", exc)
+            _embedder = SentenceTransformer(config.EMBEDDING_MODEL, local_files_only=True)
     return _embedder
 
 
