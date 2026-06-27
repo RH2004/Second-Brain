@@ -1232,33 +1232,33 @@ gantt
     axisFormat  %b %d
 
     section Stage 1 — Foundation
-    config.py · MODEL, paths, thresholds        :s1a, 2026-06-27, 1d
-    index.py · MongoDB + ChromaDB schema + CRUD :s1b, after s1a, 1d
-    notes.py · Markdown write + parse           :s1c, after s1b, 1d
-    orchestrator.py · litellm + instructor      :s1d, after s1c, 1d
-    Smoke test: save note, read it back         :s1_done, after s1d, 1d
+    Config setup and paths                      :s1a, 2026-06-27, 1d
+    MongoDB and ChromaDB schema                 :s1b, after s1a, 1d
+    Markdown file write and parse               :s1c, after s1b, 1d
+    LLM orchestrator integration                :s1d, after s1c, 1d
+    Smoke test note saving                      :s1_done, after s1d, 1d
 
     section Stage 2 — Retrieval
-    index.py · ChromaDB parent+child chunks     :s2a, after s1d, 1d
-    index.py · BM25 persistence                 :s2b, after s2a, 1d
-    reranker.py · CrossEncoder wrapper          :s2c, after s2b, 1d
-    retrieval.py · dense+sparse+RRF+rerank      :s2d, after s2c, 1d
-    Test: 10 notes · 20 queries                 :s2_done, after s2d, 1d
+    ChromaDB parent and child chunking          :s2a, after s1d, 1d
+    BM25 index persistence                      :s2b, after s2a, 1d
+    CrossEncoder reranker wrapper               :s2c, after s2b, 1d
+    Hybrid retrieval pipeline                   :s2d, after s2c, 1d
+    Test search with ten notes                  :s2_done, after s2d, 1d
 
     section Stage 3 — Session loop + router
-    session.py · sliding token window           :s3a, after s2d, 1d
-    router.py · regex fast-path                 :s3b, after s3a, 1d
-    intent.py · fast-path + LLM fallback        :s3c, after s3b, 1d
-    main.py · Rich TUI loop                     :s3d, after s3c, 1d
-    End-to-end: think → save → fresh → find     :s3_done, after s3d, 1d
+    Sliding token window logic                  :s3a, after s2d, 1d
+    Regex intent router                         :s3b, after s3a, 1d
+    Intent fallback dispatcher                  :s3c, after s3b, 1d
+    Rich Terminal TUI                           :s3d, after s3c, 1d
+    End to end TUI testing                      :s3_done, after s3d, 1d
 
     section Stage 4 — History + Profiles + Streamlit
-    history.py · MongoDB aggregations+templates :s4a, after s3d, 1d
-    profiles.py · user profile + domain weights :s4b, after s4a, 1d
-    app.py · Streamlit frontend                 :s4c, after s4b, 2d
-    proactive.py · asyncio background check     :s4d, after s4c, 1d
-    Demo recording                              :s4e, after s4d, 1d
-    DESIGN.md · NOTES.md · README               :s4f, after s4e, 1d
+    MongoDB analytics history engine            :s4a, after s3d, 1d
+    User profiles and domain weights            :s4b, after s4a, 1d
+    Streamlit web frontend                      :s4c, after s4b, 2d
+    Proactive background check                  :s4d, after s4c, 1d
+    Demo recording prep                         :s4e, after s4d, 1d
+    Documentation final review                  :s4f, after s4e, 1d
 ```
 
 ### Testability at each milestone
