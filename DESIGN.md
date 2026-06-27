@@ -87,24 +87,28 @@
 The system exposes two frontends over the same `brain/` core package: a terminal TUI (Rich + prompt_toolkit) and a Streamlit web app. Every user message passes through a single pipeline that classifies intent and routes accordingly. There are four intent modes:
 
 ```mermaid
-mindmap
-  root((Second Brain))
-    THINK
-      Free reasoning chat
-      Context-aware replies
-      Async proactive surfacing
-    SAVE
-      Compress conversation
-      Write structured note
-      Hierarchical chunk + embed
-    FIND
-      Hybrid retrieval
-      Cross-encoder reranking
-      Answer from notes
-    HISTORY
-      Access frequency
-      Recency patterns
-      Tag clustering
+graph TD
+    root((Second Brain))
+    root --> THINK[THINK]
+    root --> SAVE[SAVE]
+    root --> FIND[FIND]
+    root --> HISTORY[HISTORY]
+    
+    THINK --> THINK_1[Free reasoning chat]
+    THINK --> THINK_2[Context-aware replies]
+    THINK --> THINK_3[Async proactive surfacing]
+    
+    SAVE --> SAVE_1[Compress conversation]
+    SAVE --> SAVE_2[Write structured note]
+    SAVE --> SAVE_3[Hierarchical chunk + embed]
+    
+    FIND --> FIND_1[Hybrid retrieval]
+    FIND --> FIND_2[Cross-encoder reranking]
+    FIND --> FIND_3[Answer from notes]
+    
+    HISTORY --> HISTORY_1[Access frequency]
+    HISTORY --> HISTORY_2[Recency patterns]
+    HISTORY --> HISTORY_3[Tag clustering]
 ```
 
 The fundamental design commitment is: **what you write at save time determines what you can find later**. Note generation is a structured compression written by the LLM specifically to be retrievable — not a dump of the conversation transcript. The retrieval pipeline is layered: fast lexical and semantic candidates first, cheap local cross-encoder to rerank, LLM only for the final answer synthesis. Token spend is minimized at every step via a regex fast-path that bypasses the LLM entirely for unambiguous intents.
@@ -158,7 +162,8 @@ graph TB
         PS[asyncio background task<br/>embed recent context<br/>ChromaDB query · threshold check]
     end
 
-    TUI & STL --> SH
+    TUI --> SH
+    STL --> SH
     SH --> RGX
     RGX -->|confident match| ACTIONS
     RGX -->|ambiguous| IR
@@ -166,13 +171,18 @@ graph TB
     PROF --> IR
     TH -->|reply| FRONTENDS
     TH -.->|asyncio task every N turns| PS
-    SA --> MD & MDB & CHR & BM25P
-    FI --> VEC & BM
+    SA --> MD
+    SA --> MDB
+    SA --> CHR
+    SA --> BM25P
+    FI --> VEC
+    FI --> BM
     VEC --> RRF
     BM --> RRF
     RRF --> XE
     XE --> LOAD
-    LOAD --> MDB & MD
+    LOAD --> MDB
+    LOAD --> MD
     HI --> MDB
     PS -.->|match found| FRONTENDS
 ```
@@ -181,8 +191,10 @@ graph TB
 
 ```mermaid
 graph LR
-    main.py & app.py --> session.py
-    main.py & app.py --> intent.py
+    main.py --> session.py
+    app.py --> session.py
+    main.py --> intent.py
+    app.py --> intent.py
     session.py --> orchestrator.py
     intent.py --> router.py
     router.py --> orchestrator.py
@@ -245,7 +257,9 @@ flowchart TD
     C -->|HISTORY pattern · high confidence| F[Route → HISTORY<br/>zero LLM tokens · template response]
     C -->|No match · ambiguous| G[LLM fallback<br/>instructor · IntentResponse schema]
     G -->|THINK| H[Free reasoning reply<br/>LLM call for reply text]
-    G -->|SAVE/FIND/HISTORY| D & E & F
+    G -->|SAVE/FIND/HISTORY| D
+    G -->|SAVE/FIND/HISTORY| E
+    G -->|SAVE/FIND/HISTORY| F
 ```
 
 **Pattern definitions (`router.py`):**
@@ -394,8 +408,8 @@ flowchart TD
     subgraph RERANK["Stage 3 — Cross-encoder rerank (local · free)"]
         TOP5 --> XE[cross-encoder/ms-marco-MiniLM-L-6-v2]
         XE --> SCORES[Scalar relevance scores 0–1]
-        SCORES -->|score > 0.5| FULL[Load full note text from disk]
-        SCORES -->|all below threshold| NONE[Return: nothing found]
+        SCORES -->|"score > 0.5"| FULL[Load full note text from disk]
+        SCORES -->|"all below threshold"| NONE[Return: nothing found]
     end
 
     FULL --> ANS[LLM: answer from note text · with citations]
@@ -416,9 +430,13 @@ flowchart TD
     RGX2 -->|tag pattern| D[MongoDB: notes where tags in list]
     RGX2 -->|last month pattern| E[MongoDB: match 30d window · group]
     RGX2 -->|complex / no match| F[LLM: parse filters then query]
-    B & C & D & E --> G[Format with template string · no LLM]
+    B --> G[Format with template string · no LLM]
+    C --> G
+    D --> G
+    E --> G
     F --> H[LLM narrates result in plain English]
-    G & H --> TUI_OUT[Display to user]
+    G --> TUI_OUT[Display to user]
+    H --> TUI_OUT
 ```
 
 **Example queries it handles:**
@@ -440,8 +458,8 @@ flowchart TD
     C --> D[Embed context · sentence-transformers]
     D --> E[ChromaDB cosine query vs parent chunks]
     E --> F{Max similarity score}
-    F -->|> 0.78 threshold| G[Enqueue result to asyncio.Queue]
-    F -->|below threshold| H[Task exits · nothing shown]
+    F -->|"> 0.78 threshold"| G[Enqueue result to asyncio.Queue]
+    F -->|"below threshold"| H[Task exits · nothing shown]
     G --> I[Main loop drains queue on next render]
     I --> J[Surface soft banner · dismissible]
 ```
@@ -718,7 +736,10 @@ graph TB
     end
 
     OR --> INST --> LITE
-    LITE --> GEM & OAI & ANT & LOC
+    LITE --> GEM
+    LITE --> OAI
+    LITE --> ANT
+    LITE --> LOC
 ```
 
 ```python
@@ -979,11 +1000,25 @@ graph TB
         RGX3[re · intent fast-path]
     end
 
-    TUI3 & APP --> UTIL
-    TUI3 & APP --> INST3 --> LITE3 --> GEM3
-    TUI3 & APP --> ST3 & XE3
-    TUI3 & APP --> BM253 & CHR3
-    TUI3 & APP --> MDB3 & PF3 & MD4
+    TUI3 --> UTIL
+    APP --> UTIL
+    TUI3 --> INST3
+    APP --> INST3
+    INST3 --> LITE3 --> GEM3
+    TUI3 --> ST3
+    TUI3 --> XE3
+    APP --> ST3
+    APP --> XE3
+    TUI3 --> BM253
+    TUI3 --> CHR3
+    APP --> BM253
+    APP --> CHR3
+    TUI3 --> MDB3
+    TUI3 --> PF3
+    TUI3 --> MD4
+    APP --> MDB3
+    APP --> PF3
+    APP --> MD4
 ```
 
 **Full `requirements.txt`:**
@@ -1196,11 +1231,11 @@ sequenceDiagram
 ```mermaid
 gantt
     title Build order
-    dateFormat  D
-    axisFormat Stage %d
+    dateFormat  YYYY-MM-DD
+    axisFormat  %b %d
 
     section Stage 1 — Foundation
-    config.py · MODEL, paths, thresholds        :s1a, 1, 1d
+    config.py · MODEL, paths, thresholds        :s1a, 2026-06-27, 1d
     index.py · MongoDB + ChromaDB schema + CRUD :s1b, after s1a, 1d
     notes.py · Markdown write + parse           :s1c, after s1b, 1d
     orchestrator.py · litellm + instructor      :s1d, after s1c, 1d
