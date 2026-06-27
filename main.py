@@ -53,7 +53,7 @@ PT_STYLE = Style.from_dict({
 
 BANNER = """[bold #7c6af7]
   ╔══════════════════════════════════╗
-  ║   🧠  S E C O N D   B R A I N   ║
+  ║     S E C O N D   B R A I N      ║
   ╚══════════════════════════════════╝[/bold #7c6af7]
 [dim]Type to think out loud.  /save · /find <query> · /history · /quit[/dim]
 """
