@@ -213,6 +213,11 @@ All settings are in `brain/config.py`. Key knobs:
 
 All can be overridden via environment variables or the Streamlit settings panel.
 
+## Demo video
+
+You can download and watch the full recorded walkthrough of the Second Brain system demonstrating free reasoning, structured note saving, fresh-session recall, history analytics, and proactive note surfacing here:
+🔗 **[Download Second Brain Demo Video (MediaFire)](https://www.mediafire.com/file/gtxljsr7p9g39au/Second_brain_demo.mp4/file)**
+
 ---
 
 ## Design document

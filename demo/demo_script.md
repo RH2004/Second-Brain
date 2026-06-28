@@ -2,6 +2,10 @@
 
 Use this step-by-step script to record your demo video or run manual end-to-end tests. The script is structured to show off every requirement, including the **proactive surfacing stretch goal**.
 
+## 🎥 Demo Video
+You can download and watch the recorded demo video showing this entire script in action here:
+🔗 **[Download Second Brain Demo Video (MediaFire)](https://www.mediafire.com/file/gtxljsr7p9g39au/Second_brain_demo.mp4/file)**
+
 ---
 
 ## Preparation

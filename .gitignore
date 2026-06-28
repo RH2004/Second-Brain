@@ -36,3 +36,6 @@ Thumbs.db
 
 # Test artifacts
 *.log
+
+# Large files
+demo/*.mp4
