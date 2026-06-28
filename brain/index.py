@@ -307,6 +307,7 @@ def dense_search(query_embedding: list[float], top_k: int = 10) -> list[dict]:
     distances = results.get("distances", [[]])[0]
 
     for meta, dist in zip(metadatas, distances):
+        meta = meta or {}
         parent_id = meta.get("parent_id", "")
         if parent_id and parent_id not in seen:
             seen.add(parent_id)
@@ -334,6 +335,7 @@ def dense_parent_search(query_embedding: list[float], top_k: int = 10) -> list[d
     documents = results.get("documents", [[]])[0]
 
     for meta, dist, doc in zip(metadatas, distances, documents):
+        meta = meta or {}
         ranked.append({
             "note_id": meta.get("note_id", ""),
             "score":   1.0 - dist,
