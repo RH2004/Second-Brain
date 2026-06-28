@@ -271,7 +271,7 @@ with st.sidebar:
     with st.expander("⚙️ Settings"):
         new_model = st.selectbox(
             "LLM model",
-            ["gemini/gemini-1.5-flash", "gpt-4o", "claude-sonnet-4-6", "ollama/llama3"],
+            ["gemini/gemini-2.5-flash", "gpt-4o", "claude-sonnet-4-6", "ollama/llama3"],
             index=0,
             key="settings_model",
         )

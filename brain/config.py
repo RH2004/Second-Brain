@@ -27,11 +27,11 @@ MONGO_DB  = os.getenv("MONGO_DB", "second_brain")
 # ─── LLM ──────────────────────────────────────────────────────────────────────
 # Swap model by changing this one line (or setting LLM_MODEL env var).
 # Supported values:
-#   "gemini/gemini-1.5-flash"   ← default, free tier
+#   "gemini/gemini-2.5-flash"   ← default, free tier
 #   "gpt-4o"
 #   "claude-sonnet-4-6"
 #   "ollama/llama3"
-MODEL = os.getenv("LLM_MODEL", "gemini/gemini-1.5-flash")
+MODEL = os.getenv("LLM_MODEL", "gemini/gemini-2.5-flash")
 
 # ─── Embedding + reranking ────────────────────────────────────────────────────
 EMBEDDING_MODEL = os.getenv(

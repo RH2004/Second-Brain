@@ -44,7 +44,7 @@ echo GEMINI_API_KEY=your_key_here > .env
 Supported models (set `LLM_MODEL` in `.env` to switch):
 
 ```env
-LLM_MODEL=gemini/gemini-1.5-flash   # default — free tier
+LLM_MODEL=gemini/gemini-2.5-flash   # default — free tier
 # LLM_MODEL=gpt-4o
 # LLM_MODEL=claude-sonnet-4-6
 # LLM_MODEL=ollama/llama3           # fully local, no API key needed
@@ -205,7 +205,7 @@ All settings are in `brain/config.py`. Key knobs:
 
 | Setting | Default | Description |
 |---------|---------|-------------|
-| `MODEL` | `gemini/gemini-1.5-flash` | LLM provider |
+| `MODEL` | `gemini/gemini-2.5-flash` | LLM provider |
 | `TOKEN_BUDGET` | `80,000` | Sliding context window cap |
 | `RERANK_THRESHOLD` | `0.5` | Minimum cross-encoder score |
 | `PROACTIVE_THRESHOLD` | `0.78` | Similarity threshold for surfacing |
