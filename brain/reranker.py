@@ -52,7 +52,7 @@ def rerank(
     if not candidates:
         return []
 
-    threshold = threshold if threshold is not None else config.RERANK_THRESHOLD
+    threshold = threshold if threshold is not None else config.get("rerank_threshold")
     reranker  = _get_reranker()
 
     pairs  = [(query, f"{c['title']}. {c.get('summary', '')}") for c in candidates]

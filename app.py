@@ -275,10 +275,15 @@ with st.sidebar:
             index=0,
             key="settings_model",
         )
-        new_threshold = st.slider(
-            "Reranker threshold (ms-marco logits)", -20.0, 5.0, -5.0, 0.5,
-            key="settings_threshold",
+        new_rerank_threshold = st.slider(
+            "Reranker threshold (ms-marco logits)", -20.0, 5.0, float(cfg.get("rerank_threshold") or -5.0), 0.5,
+            key="settings_rerank_threshold",
             help="ms-marco-MiniLM returns raw logits. -5.0 is a sensible default.",
+        )
+        new_proactive_threshold = st.slider(
+            "Proactive threshold (similarity)", 0.3, 1.0, float(cfg.get("proactive_threshold") or 0.55), 0.01,
+            key="settings_proactive_threshold",
+            help="Cosine similarity threshold for past note surfacing. 0.55 is a sensible default.",
         )
         new_budget = st.number_input(
             "Token budget", 10_000, 200_000,
@@ -288,7 +293,8 @@ with st.sidebar:
         if st.button("Apply settings", key="apply_settings"):
             cfg.update_config(
                 model=new_model,
-                proactive_threshold=new_threshold,
+                rerank_threshold=new_rerank_threshold,
+                proactive_threshold=new_proactive_threshold,
                 token_budget=new_budget,
             )
             st.success("Settings updated!")

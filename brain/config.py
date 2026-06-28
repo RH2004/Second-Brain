@@ -52,8 +52,8 @@ SPARSE_TOP_K:         int   = 10       # BM25 candidates to fetch
 RRF_K:                int   = 60       # RRF constant (k in 1/(k+rank))
 RERANK_TOP_N:         int   = 5        # candidates fed to cross-encoder
 RERANK_THRESHOLD:     float = float(os.getenv("RERANK_THRESHOLD", "-5.0"))   # ms-marco returns raw logits
-PROACTIVE_THRESHOLD:  float = float(os.getenv("PROACTIVE_THRESHOLD", "0.78"))
-PROACTIVE_EVERY_N:    int   = 4        # trigger proactive check every N turns
+PROACTIVE_THRESHOLD:  float = float(os.getenv("PROACTIVE_THRESHOLD", "0.55"))
+PROACTIVE_EVERY_N:    int   = 1        # trigger proactive check every N turns
 
 # ─── System prompt ────────────────────────────────────────────────────────────
 SYSTEM_PROMPT = (
@@ -70,6 +70,7 @@ _runtime: dict = {
     "model":               MODEL,
     "token_budget":        TOKEN_BUDGET,
     "proactive_threshold": PROACTIVE_THRESHOLD,
+    "rerank_threshold":    RERANK_THRESHOLD,
 }
 
 
