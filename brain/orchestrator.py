@@ -31,6 +31,57 @@ def _model() -> str:
     return config.get("model") or config.MODEL
 
 
+def _safe_completion(messages: list[dict], response_model=None, max_tokens: int = 800):
+    """
+    Wrap LLM completion calls to support automatic fallback.
+    If the primary Gemini call fails, automatically retry using OpenRouter
+    (if OPENROUTER_API_KEY is configured in the environment).
+    """
+    primary = _model()
+    try:
+        if response_model:
+            return _instructor_client.chat.completions.create(
+                model=primary,
+                messages=messages,
+                response_model=response_model,
+                max_tokens=max_tokens,
+            )
+        else:
+            return litellm.completion(
+                model=primary,
+                messages=messages,
+                max_tokens=max_tokens,
+            )
+    except Exception as primary_exc:
+        import os
+        or_key = os.getenv("OPENROUTER_API_KEY")
+        if or_key:
+            backup = "openrouter/google/gemini-2.5-flash"
+            logger.warning(
+                "Primary model %s failed: %s. Falling back to OpenRouter model: %s",
+                primary, primary_exc, backup
+            )
+            try:
+                if response_model:
+                    return _instructor_client.chat.completions.create(
+                        model=backup,
+                        messages=messages,
+                        response_model=response_model,
+                        max_tokens=max_tokens,
+                    )
+                else:
+                    return litellm.completion(
+                        model=backup,
+                        messages=messages,
+                        max_tokens=max_tokens,
+                    )
+            except Exception as backup_exc:
+                logger.error("Backup model %s also failed: %s", backup, backup_exc)
+                raise backup_exc
+        else:
+            raise primary_exc
+
+
 # ─── Pydantic schemas ─────────────────────────────────────────────────────────
 
 class IntentResponse(BaseModel):
@@ -69,14 +120,13 @@ def classify_intent(messages: list[dict], user_message: str) -> IntentResponse:
     payload = messages + [{"role": "user", "content": user_message}]
 
     try:
-        return _instructor_client.chat.completions.create(
-            model=_model(),
+        return _safe_completion(
             messages=[{"role": "system", "content": _INTENT_SYSTEM}] + payload[-6:],
             response_model=IntentResponse,
             max_tokens=400,
         )
     except Exception as exc:
-        logger.error("Intent classification failed: %s", exc)
+        logger.error("Intent classification failed (even with backup): %s", exc)
         return IntentResponse(intent="THINK", confidence=0.5, reply="Let's keep thinking.")
 
 
@@ -85,14 +135,13 @@ def classify_intent(messages: list[dict], user_message: str) -> IntentResponse:
 def think_reply(messages: list[dict]) -> str:
     """Generate a free-form THINK reply from the full conversation context."""
     try:
-        resp = litellm.completion(
-            model=_model(),
+        resp = _safe_completion(
             messages=[{"role": "system", "content": config.SYSTEM_PROMPT}] + messages,
             max_tokens=800,
         )
         return resp.choices[0].message.content or ""
     except Exception as exc:
-        logger.error("THINK reply failed: %s", exc)
+        logger.error("THINK reply failed (even with backup): %s", exc)
         return "I'm having trouble connecting to the LLM. Please check your API key."
 
 
@@ -116,14 +165,13 @@ def generate_note_content(transcript: str) -> NoteResponse:
         {"role": "user",   "content": f"Generate a note from this thinking session:\n\n{transcript}"},
     ]
     try:
-        return _instructor_client.chat.completions.create(
-            model=_model(),
+        return _safe_completion(
             messages=messages,
             response_model=NoteResponse,
             max_tokens=1200,
         )
     except Exception as exc:
-        logger.error("Note generation failed: %s", exc)
+        logger.error("Note generation failed (even with backup): %s", exc)
         # Return a minimal fallback note
         return NoteResponse(
             title="Session Note",
@@ -157,10 +205,10 @@ def synthesise_answer(query: str, notes: list[dict]) -> str:
         {"role": "user",    "content": f"Question: {query}\n\n{notes_text}"},
     ]
     try:
-        resp = litellm.completion(model=_model(), messages=messages, max_tokens=800)
+        resp = _safe_completion(messages=messages, max_tokens=800)
         return resp.choices[0].message.content or "No answer found."
     except Exception as exc:
-        logger.error("Answer synthesis failed: %s", exc)
+        logger.error("Answer synthesis failed (even with backup): %s", exc)
         return "I couldn't synthesise an answer. Please check your API key."
 
 
@@ -181,8 +229,8 @@ def narrate_history(query: str, result_data: str) -> str:
         {"role": "user",   "content": f"Query: {query}\n\nData:\n{result_data}"},
     ]
     try:
-        resp = litellm.completion(model=_model(), messages=messages, max_tokens=300)
+        resp = _safe_completion(messages=messages, max_tokens=300)
         return resp.choices[0].message.content or result_data
     except Exception as exc:
-        logger.error("History narration failed: %s", exc)
+        logger.error("History narration failed (even with backup): %s", exc)
         return result_data
