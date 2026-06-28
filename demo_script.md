@@ -48,12 +48,14 @@ Use this step-by-step script to record your demo video or run manual end-to-end 
 *This shows the system proactively suggesting the past note mid-thought without being asked.*
 
 1. **Step 1:** Clear the session again by clicking **🗑️ New session** in the sidebar.
-2. **Step 2:** Start a brand new discussion on a related topic. The proactive similarity engine now runs on every user message:
+2. **Step 2:** Start a brand new discussion on a related topic. Copy and paste these user prompts in sequence, waiting for the assistant's reply after each turn:
    - **Turn 1 (User):** "I'm starting to design a system that needs to store session tokens."
    - **Turn 2 (User):** "I need the system to scale horizontally and handle thousands of reads per second."
    - **Turn 3 (User):** "To prevent hotspots, I'm thinking about hash rings and replication across servers."
+   - **Turn 4 (User):** "We should distribute keys across nodes using consistent hashing."
+   - **Turn 5 (User):** "We should also use a replication factor of 3 to make sure the tokens are highly available."
 3. **Verification:**
-   - As soon as your messages are submitted, a banner will appear at the top of the chat area:
+   - During the conversation, a banner will appear at the top of the chat area:
      `💡 RELATED NOTE SURFACED: Distributed Key-Value Cache Design`
    - This proves the background task detected the semantic overlap with your previous cache note without you asking for it!
 
