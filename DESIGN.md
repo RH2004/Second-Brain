@@ -744,7 +744,7 @@ graph TB
 
 ```python
 # config.py
-MODEL = "gemini/gemini-1.5-flash"
+MODEL = "gemini/gemini-2.5-flash"
 # MODEL = "gpt-4o"
 # MODEL = "claude-sonnet-4-6"
 # MODEL = "ollama/llama3"
@@ -952,7 +952,7 @@ A sidebar expander exposes key config options at runtime without editing files:
 with st.sidebar.expander("⚙ Settings"):
     new_model = st.selectbox(
         "LLM model",
-        ["gemini/gemini-1.5-flash", "gpt-4o", "claude-sonnet-4-6", "ollama/llama3"],
+        ["gemini/gemini-2.5-flash", "gpt-4o", "claude-sonnet-4-6", "ollama/llama3"],
         index=0
     )
     threshold = st.slider("Proactive surfacing threshold", 0.5, 1.0, 0.78, 0.01)
